@@ -198,53 +198,126 @@
     }
 
 
-    /* ---------- COLLAGE (fotos reais, sem texto) ---------- */
-    .collage {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 1.2rem;
-      flex-wrap: wrap;
-      max-width: 820px;
+    /* ---------- FOTO: cabelo longo tampa a normal ---------- */
+    .photo-swap {
+      display: block;
       margin: 0 auto;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
     }
 
-    .collage img {
-      width: 150px;
-      height: 190px;
-      object-fit: cover;
-      border-radius: 10px;
+    .photo-swap.revealed {
+      cursor: default;
+    }
+
+    .photo-frame {
+      position: relative;
+      display: block;
+      width: min(300px, 80vw);
+      aspect-ratio: 3 / 4;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg-mid);
       box-shadow: 0 20px 40px -18px rgba(0, 0, 0, .7);
-      filter: saturate(1.12) contrast(1.02);
-      animation: float 5s ease-in-out infinite;
     }
 
-    .collage img:nth-child(1) {
-      transform: rotate(-4deg);
-      animation-delay: 0s;
+    .photo-frame img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
-    .collage img:nth-child(2) {
-      transform: rotate(3deg) translateY(-10px);
-      animation-delay: .5s;
-      width: 170px;
-      height: 210px;
+    /* a normal fica invisível até o toque: assim ela nunca aparece antes da hora,
+       mesmo se a cabelo-longo demorar pra carregar ou tiver partes transparentes */
+    .photo-frame .normal {
+      opacity: 0;
     }
 
-    .collage img:nth-child(3) {
-      transform: rotate(-2deg);
-      animation-delay: 1s;
+    .photo-swap.revealed .normal {
+      opacity: 1;
     }
 
-    @keyframes float {
+    .photo-frame .hair {
+      z-index: 2;
+      transition: opacity .45s ease;
+    }
+
+    .photo-swap.revealed .hair {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* chacoalha o quadro inteiro (não só a foto de cima) pra nunca aparecer a normal pelas bordas */
+    .photo-swap.shake:not(.revealed) .photo-frame {
+      animation: photoShakeBurst 1.4s linear infinite;
+    }
+
+    .photo-swap:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    @media (hover: hover) {
+      .photo-swap:not(.revealed):hover .photo-frame {
+        animation: photoShake .4s linear infinite;
+      }
+    }
+
+    /* rajadas: chacoalha ~0,6s, descansa ~0,8s (cansa menos que tremer sem parar) */
+    @keyframes photoShakeBurst {
+
+      0%,
+      45%,
+      100% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+
+      5%,
+      25% {
+        transform: translate(-4px, 1px) rotate(-1.5deg);
+      }
+
+      10%,
+      30% {
+        transform: translate(4px, -1px) rotate(1.5deg);
+      }
+
+      15%,
+      35% {
+        transform: translate(-3px, -1px) rotate(-1deg);
+      }
+
+      20%,
+      40% {
+        transform: translate(3px, 1px) rotate(1deg);
+      }
+    }
+
+    @keyframes photoShake {
 
       0%,
       100% {
-        transform: translateY(0) rotate(var(--r, 0deg));
+        transform: translate(0, 0) rotate(0deg);
       }
 
-      50% {
-        transform: translateY(-10px) rotate(var(--r, 0deg));
+      20% {
+        transform: translate(-4px, 1px) rotate(-1.5deg);
+      }
+
+      40% {
+        transform: translate(4px, -1px) rotate(1.5deg);
+      }
+
+      60% {
+        transform: translate(-3px, -1px) rotate(-1deg);
+      }
+
+      80% {
+        transform: translate(3px, 1px) rotate(1deg);
       }
     }
 
@@ -661,18 +734,6 @@
         height: 200px;
       }
 
-      /* fotos: duas em cima, uma centralizada embaixo */
-      .collage {
-        gap: 1rem;
-      }
-
-      .collage img,
-      .collage img:nth-child(2) {
-        width: min(160px, calc(50% - .5rem));
-        height: auto;
-        aspect-ratio: 150 / 190;
-      }
-
       .guess-box {
         padding: 1.8rem 1.2rem;
       }
@@ -696,19 +757,19 @@
   <!-- ================= HERO ================= -->
   <section class="hero">
     <div id="petals"></div>
-    <h1>Feliz<br>Aniversário</h1>
-    <div class="scroll-cue">Tulipas roxas!!! ↓</div>
+    <h1>Feliz<br>Aniversário!!!</h1>
+    <div class="scroll-cue">Tem algo atrás. . .</div>
   </section>
 
-  <!-- ================= COLLAGE ================= -->
+  <!-- ================= FOTO ================= -->
   <section>
-    <div class="collage">
-      <img src="https://images.pexels.com/photos/7474950/pexels-photo-7474950.jpeg?auto=compress&cs=tinysrgb&w=500"
-        alt="">
-      <img src="https://images.pexels.com/photos/33484355/pexels-photo-33484355.jpeg?auto=compress&cs=tinysrgb&w=500"
-        alt="">
-      <img src="https://images.pexels.com/photos/30786293/pexels-photo-30786293.jpeg?auto=compress&cs=tinysrgb&w=500"
-        alt="">
+    <div class="section-inner">
+      <button class="photo-swap" id="photoSwap" type="button" aria-label="Toque na foto">
+        <span class="photo-frame">
+          <img class="normal" src="normal.jpg" alt="">
+          <img class="hair" src="cabelo-longo.jpg" alt="">
+        </span>
+      </button>
     </div>
   </section>
 
@@ -743,7 +804,7 @@
       <div class="guess-box">
         <input id="ageInput" type="number" placeholder="sua idade" inputmode="numeric">
         <br>
-        <button id="ageBtn">Confirmar</button>
+        <button id="ageBtn">confirmar</button>
         <div class="guess-feedback" id="ageFeedback"></div>
       </div>
     </div>
@@ -816,6 +877,20 @@
     }
     // continua gerando novas pétalas
     setInterval(() => spawnPetal(), 800 + Math.random() * 600);
+
+    // foto: a de cabelo longo chacoalha enquanto está na tela e, ao tocar, revela a normal
+    const photoSwap = document.getElementById('photoSwap');
+    // celular não tem "passar o mouse": chacoalha quando ela rola até a foto
+    new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (photoSwap.classList.contains('revealed')) return;
+        photoSwap.classList.toggle('shake', e.isIntersecting);
+      });
+    }, { threshold: 0.4 }).observe(photoSwap);
+    photoSwap.addEventListener('click', () => {
+      photoSwap.classList.add('revealed');
+      photoSwap.classList.remove('shake');
+    });
 
     // candles
     const candles = document.querySelectorAll('.candle');
